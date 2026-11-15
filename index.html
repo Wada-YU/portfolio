@@ -1,12 +1,298 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>My Portfolio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070c16">
+  <meta name="description" content="和田 悠（Yu Wada）のポートフォリオ。Python、AI・データ分析の学習、高専祭の活動を紹介しています。">
+  <title>Yu Wada | AI & Creative Portfolio</title>
+  <style>
+    :root { --bg:#070c16; --panel:#0f1a2b; --text:#eaf5ff; --muted:#9bacc3; --line:rgba(138,180,215,.17); --cyan:#75e5f4; --blue:#6b9dff; --purple:#a492ff; --radius:22px; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; background:var(--bg); color:var(--text); font-family: "Inter", "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif; line-height:1.9; font-size:15px; overflow-x:hidden; }
+    body::before { content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;background:radial-gradient(circle at 85% 12%,rgba(45,86,174,.24),transparent 34%), radial-gradient(circle at 7% 75%,rgba(61,44,120,.18),transparent 40%),#070c16; }
+    #neuronCanvas { position:fixed; inset:0; width:100%; height:100%; z-index:-1; pointer-events:none; opacity:.8; }
+    a { color:inherit; text-decoration:none; }
+    button { font:inherit; }
+    a:focus-visible, button:focus-visible { outline:2px solid var(--cyan);outline-offset:5px; }
+    .container { width:min(1130px, calc(100% - 48px)); margin-inline:auto; }
+    .site-header { position:sticky; top:0; z-index:30; border-bottom:1px solid rgba(156,183,216,.12); backdrop-filter:blur(20px); background:rgba(7,12,22,.67); }
+    .header-inner { min-height:72px; display:flex;align-items:center;justify-content:space-between;gap:20px; }
+    .brand { display:inline-flex;align-items:center;gap:10px;white-space:nowrap;font-weight:750;letter-spacing:.08em;font-size:15px; }
+    .brand-dot { width:11px;height:11px; background:var(--cyan);border-radius:50%;box-shadow:0 0 25px rgba(111,233,255,.85); }
+    .nav { display:flex;align-items:center;gap:clamp(14px,2vw,30px); }
+    .nav a { font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);transition:color .2s; }
+    .nav a:hover { color:var(--cyan); }
+    .hero { min-height:min(800px, calc(100svh - 72px)); display:flex; flex-direction:column;justify-content:center;position:relative;padding:94px 0 105px; }
+    .hero::before { content:"";position:absolute;inset:12% 9% 16%;z-index:-1;background:radial-gradient(ellipse at 50% 42%,rgba(14,25,58,.38),transparent 65%);pointer-events:none; }
+    .eyebrow { display:inline-flex;gap:11px;align-items:center;color:var(--cyan);font-size:11px;letter-spacing:.27em;font-weight:750;text-transform:uppercase; }
+    .eyebrow::before {content:"";display:block;width:32px;height:1px;background:var(--cyan);}
+    .hero h1 { font-size:clamp(74px,13vw,155px);line-height:.95;letter-spacing:-.082em;margin:29px 0 5px;font-weight:800; }
+    .hero h1 > span {display:block;}
+    .hero h1 .first {background:linear-gradient(95deg,#f7fcff 24%,#a7e6ff 67%,#9b9cff 100%);color:transparent;background-clip:text;}
+    .hero-jp {font-size:clamp(16px,2vw,22px);font-weight:650;letter-spacing:.25em;margin:24px 0 21px;color:#c4d5e8;}
+    .hero-message { font-size:clamp(19px,2.6vw,29px);font-weight:650;line-height:1.65;letter-spacing:.015em;max-width:760px;margin:0 0 17px;text-wrap:balance; }
+    .hero-lead { max-width:650px;color:var(--muted);font-size:14px;line-height:2; }
+    .hero-bottom { margin-top:38px;display:flex;flex-wrap:wrap;gap:14px;align-items:center; }
+    .button { display:inline-flex;align-items:center;justify-content:center;gap:11px;border:1px solid var(--line);border-radius:999px;padding:12px 22px;background:rgba(14,25,43,.77);font-size:13px;font-weight:700;transition:transform .2s,background .2s,border-color .2s; }
+    .button:hover { transform:translateY(-2px);background:#172a42;border-color:rgba(117,229,244,.65); }
+    .button.primary { color:#05121d;background:linear-gradient(110deg,#85e8f5,#89b5ff);border:0; }
+    .button.primary:hover {background:linear-gradient(110deg,#a9f1fb,#b4caff);}
+    .hero-note {color:#839ab6;font-size:11px;letter-spacing:.05em;}
+    .scroll-cue { position:absolute;bottom:34px;left:0;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);display:flex;gap:15px;align-items:center; }
+    .scroll-cue:after {content:"";width:70px;height:1px;background:linear-gradient(90deg,var(--cyan),transparent);}
+    section.content-section {padding:105px 0 10px;scroll-margin-top:65px;}
+    .section-head { margin-bottom:38px;display:flex;align-items:flex-end;gap:18px; }
+    .section-number {color:var(--cyan);font-size:12px;letter-spacing:.1em;font-family:ui-monospace,Consolas,monospace;padding-bottom:12px;}
+    .section-title { margin:0;font-size:clamp(30px,5vw,48px);font-weight:780;letter-spacing:-.04em;line-height:1.1; }
+    .section-sub {color:var(--muted);font-size:13px;letter-spacing:.04em;margin:12px 0 0;}
+    .surface {background:linear-gradient(145deg,rgba(18,33,54,.87),rgba(10,18,32,.84));border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 12px 55px rgba(0,0,0,.11);}
+    .about-grid {display:grid;grid-template-columns:1.2fr .8fr;gap:22px;}
+    .about-main {padding:35px 36px;}
+    .about-main h3 {font-size:clamp(20px,2.3vw,26px);line-height:1.7;margin:0 0 24px;}
+    .about-main p {color:var(--muted);font-size:14px;line-height:2.1;margin:0;}
+    .about-aside {padding:35px;}
+    .meta-label {font-size:11px;letter-spacing:.17em;color:var(--cyan);font-weight:750;text-transform:uppercase;margin:0 0 11px;}
+    .meta-value {font-size:19px;font-weight:700;line-height:1.55;margin:0 0 25px;}
+    .meta-sub {font-size:13px;color:var(--muted);margin:0;}
+    .underline-glow { background:linear-gradient(transparent 70%,rgba(97,184,240,.16) 70%); }
+    .feature {padding:34px 34px 38px;margin-bottom:24px;position:relative;overflow:hidden;}
+    .feature::before {content:"";position:absolute;width:250px;height:250px;right:-100px;top:-110px;pointer-events:none;background:radial-gradient(circle,rgba(91,126,243,.16),transparent 71%);}
+    .project-top {display:flex;gap:20px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;}
+    .project-overline {color:var(--cyan);font:700 11px/1.7 ui-monospace,Consolas,monospace;letter-spacing:.15em;margin:0 0 10px;}
+    .project-title {font-size:clamp(23px,3vw,34px);line-height:1.5;margin:0 0 13px;letter-spacing:-.04em;}
+    .project-description {max-width:805px;color:var(--muted);font-size:14px;line-height:2.08;margin:0;}
+    .pills {display:flex;flex-wrap:wrap;gap:9px;margin:23px 0 0;}
+    .pill {color:#c2d9ed;border:1px solid rgba(123,174,215,.25);font-size:11px;font-weight:650;letter-spacing:.02em;border-radius:999px;padding:5px 12px;background:rgba(21,37,60,.7);}
+    .gallery {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:29px;}
+    .gallery-item {display:block;position:relative;border:1px solid rgba(134,176,204,.22);border-radius:15px;overflow:hidden;background:#101f33;padding:0;cursor:zoom-in;text-align:left;color:inherit;transition:transform .2s,border-color .2s;}
+    .gallery-item:hover {transform:translateY(-3px);border-color:rgba(117,229,244,.68);}
+    .gallery-item img {display:block;width:100%;aspect-ratio:14/8.5;object-fit:cover;}
+    .gallery-caption {display:block;padding:11px 15px;font-size:12px;color:#bbcee2;}
+    .status-note {font-size:12px;color:var(--muted);background:rgba(11,23,40,.72);border-left:2px solid var(--purple);margin-top:20px;padding:10px 15px;}
+    .project-actions {display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:24px;}
+    .skills-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
+    .skill {padding:27px 27px 25px;min-height:164px;}
+    .skill-icon {color:var(--cyan);font-size:22px;margin-bottom:14px;font-weight:800;}
+    .skill h3 {margin:0;font-size:18px;line-height:1.4;}
+    .skill p {font-size:12px;color:var(--muted);line-height:1.8;margin:8px 0 0;}
+    .learning-grid {display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+    .learn-item {padding:33px;}
+    .learn-item .learn-num {font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--cyan);letter-spacing:.12em;}
+    .learn-item h3 {font-size:21px;line-height:1.55;margin:13px 0 12px;}
+    .learn-item p {font-size:13px;color:var(--muted);line-height:2.1;margin:0;}
+    .closing {padding:65px 0 80px;}
+    .closing-panel {text-align:center;padding:52px 28px;background:linear-gradient(110deg,rgba(29,48,75,.72),rgba(14,26,46,.9));border:1px solid rgba(122,195,235,.27);border-radius:25px;}
+    .closing-panel h2 {font-size:clamp(25px,4vw,39px);line-height:1.55;letter-spacing:-.04em;margin:0 0 12px;}
+    .closing-panel p {color:var(--muted);font-size:13px;margin:0 0 25px;}
+    footer {padding:28px 0 40px;border-top:1px solid var(--line);color:#8ca0b9;font-size:11px;letter-spacing:.07em;}
+    .footer-inner {display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;}
+    dialog {border:1px solid rgba(147,186,222,.4);border-radius:16px;padding:18px;background:#09111f;color:var(--text);max-width:min(1100px,calc(100vw - 24px));max-height:92vh;box-shadow:0 40px 80px rgba(0,0,0,.7);}
+    dialog::backdrop {background:rgba(0,0,0,.86);backdrop-filter:blur(8px);}
+    .lightbox-toolbar {display:flex;justify-content:space-between;gap:20px;align-items:center;font-size:13px;margin-bottom:13px;}
+    .lightbox-close {background:#142740;border:1px solid var(--line);border-radius:8px;color:var(--text);cursor:pointer;padding:5px 10px;}
+    .lightbox-image {display:block;width:100%;height:auto;max-height:78vh;object-fit:contain;}
+    .muted {color:var(--muted);}
+    @media(max-width:800px){ .nav {gap:12px;} .nav a{font-size:10px;} .about-grid,.learning-grid{grid-template-columns:1fr;} .skills-grid{grid-template-columns:repeat(2,minmax(0,1fr));} .hero{min-height:700px;} .about-main,.about-aside{padding:29px;} }
+    @media(max-width:570px){.container{width:min(100% - 34px,1130px);} .header-inner{min-height:66px;} .nav a:nth-child(2),.nav a:nth-child(4){display:none;} .hero{padding:80px 0 110px;min-height:670px;} .hero h1{font-size:clamp(64px,16vw,102px);letter-spacing:-.075em;} .hero-jp{font-size:17px;} .hero-message{font-size:20px;} .hero-lead{font-size:13px;}section.content-section{padding-top:77px;} .gallery{grid-template-columns:1fr;gap:13px;} .skills-grid{grid-template-columns:1fr 1fr;gap:12px;} .skill{padding:19px;min-height:145px;} .skill h3{font-size:15px;} .feature{padding:25px 20px;} .project-title{font-size:24px;} .section-number{padding-bottom:7px;} .closing{padding-top:60px;} .project-actions .button{width:100%;} }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}*,*::before,*::after{animation:none !important;transition:none !important;}}
+  </style>
 </head>
 <body>
-  <h1>My Portfolio</h1>
-  <p>現在制作中です。</p>
+  <canvas id="neuronCanvas" aria-hidden="true"></canvas>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#home" aria-label="トップに戻る"><span class="brand-dot"></span>YU WADA<span style="color:var(--cyan)">.</span></a>
+      <nav class="nav" aria-label="ページ内メニュー">
+        <a href="#about">About</a><a href="#works">Works</a><a href="#skills">Skills</a><a href="#learning">Learning</a><a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <section class="container hero" id="home" aria-labelledby="hero-title">
+      <span class="eyebrow">AI / DATA / HUMAN-CENTERED DESIGN</span>
+      <h1 id="hero-title"><span class="first">YU</span><span class="first">WADA<span style="color:var(--cyan)">.</span></span></h1>
+      <p class="hero-jp">和田 悠 / Portfolio 2026</p>
+      <p class="hero-message">技術で生活を豊かにし、<br>気持ちにも寄り添うAIへ。</p>
+      <p class="hero-lead">大阪公立大学工業高等専門学校・知能情報コース2年。<br>プログラミングとAIを学びながら、人の考えや気持ちを大切にする技術を目指しています。</p>
+      <div class="hero-bottom"><a class="button primary" href="#works">制作物を見る <span aria-hidden="true">↗</span></a><span class="hero-note">MOVE YOUR MOUSE — ニューロンが反応します</span></div>
+      <div class="scroll-cue">Scroll to explore</div>
+    </section>
+
+    <section class="container content-section" id="about" aria-labelledby="about-heading">
+      <div class="section-head"><span class="section-number">01 /</span><div><h2 class="section-title" id="about-heading">About me</h2><p class="section-sub">自己紹介・目指していること</p></div></div>
+      <div class="about-grid">
+        <article class="surface about-main">
+          <h3>便利なだけではなく、<br><span class="underline-glow">人の気持ちも尊重できる技術</span>を。</h3>
+          <p>将来は、AI技術を活用して人々の生活を豊かにする開発者になりたいと考えています。ただ便利なものを作るだけでなく、使う人の気持ちや考えを蔑ろにしない技術を作りたいです。そのために、プログラミングやデータ分析、AIの仕組みを学んでいます。</p>
+        </article>
+        <aside class="surface about-aside" aria-label="基本情報">
+          <p class="meta-label">Name</p><p class="meta-value">和田 悠 <span class="muted">/ Yu Wada</span></p>
+          <p class="meta-label">Education</p><p class="meta-value">大阪公立大学<br>工業高等専門学校</p>
+          <p class="meta-label">Field</p><p class="meta-sub">知能情報コース / 2年</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="container content-section" id="works" aria-labelledby="works-heading">
+      <div class="section-head"><span class="section-number">02 /</span><div><h2 class="section-title" id="works-heading">Selected works</h2><p class="section-sub">授業での制作物と、チームでの活動</p></div></div>
+      <article class="surface feature" aria-labelledby="python-heading">
+        <p class="project-overline">WORK 01 / PYTHON · INDIVIDUAL PROJECT</p>
+        <h3 class="project-title" id="python-heading">ポテンシャル発見ツール<br><span style="color:#b0c2d8;font-size:.67em;font-weight:500">ダメ出しじゃなく、成長のコードを</span></h3>
+        <p class="project-description">「雰囲気」や「手応え」といった感覚的な評価を、項目ごとに数値化して整理するPythonプログラムを作成しました。現在のスコアや達成率、改善できる余地を表示します。点数の低さを単なる欠点ではなく「伸びしろ」として前向きに捉えられるようにしたところが工夫した点です。</p>
+        <div class="pills"><span class="pill">Python</span><span class="pill">辞書（dict）</span><span class="pill">関数・条件分岐</span><span class="pill">制作：約20時間</span></div>
+        <div class="gallery" aria-label="Python作品の画像4枚">
+          <button class="gallery-item" type="button" data-image="assets/python-01.png" data-caption="作品概要・使い道"><img src="assets/python-01.png" loading="lazy" alt="ポテンシャル発見ツールの作品概要と活用例"><span class="gallery-caption">01 — 作品概要・使い道</span></button>
+          <button class="gallery-item" type="button" data-image="assets/python-02.png" data-caption="達成率と伸びしろの計算処理"><img src="assets/python-02.png" loading="lazy" alt="分析用のPythonコードの抜粋"><span class="gallery-caption">02 — 達成率と伸びしろの計算処理</span></button>
+          <button class="gallery-item" type="button" data-image="assets/python-03.png" data-caption="レポート表示処理"><img src="assets/python-03.png" loading="lazy" alt="結果表示のPythonコードの抜粋"><span class="gallery-caption">03 — レポート表示処理</span></button>
+          <button class="gallery-item" type="button" data-image="assets/python-04.png" data-caption="実際のプログラム実行結果"><img src="assets/python-04.png" loading="lazy" alt="実際の実行結果。全体のイイ感じ度61.7パーセント"><span class="gallery-caption">04 — 実際のプログラム実行結果</span></button>
+        </div>
+        <p class="status-note">上の4枚は提出されたノートブックの説明・コード・実行結果から作成した図版です。元のGoogle Colabの画面写真も、必要に応じて追加できます。</p>
+        <div class="project-actions"><a class="button" href="assignment04.ipynb" download>作品のノートブック (.ipynb) <span aria-hidden="true">↓</span></a><a class="button" id="github-notebook" href="#works" hidden target="_blank" rel="noopener noreferrer">GitHubでコードを見る <span aria-hidden="true">↗</span></a></div>
+      </article>
+
+      <article class="surface feature" aria-labelledby="festival-heading">
+        <p class="project-overline">WORK 02 / KOSEN FESTIVAL · TEAM PROJECT</p>
+        <h3 class="project-title" id="festival-heading">中百舌鳥キャンパスを舞台にした3Dゲーム展示</h3>
+        <p class="project-description">高専祭では、中百舌鳥キャンパスをモチーフにした3Dゲーム「KosenNIGHT」の展示に参加しました。私はゲームそのものの制作ではなく、展示内容のアイデアを考え、来場者に内容や楽しみ方を説明する役割を担当しました。チームの作品を初めて見る人にも伝わるよう、企画と説明の面から活動に関わりました。</p>
+        <div class="pills"><span class="pill">展示企画</span><span class="pill">来場者への説明</span><span class="pill">チーム活動</span></div>
+        <div class="gallery" aria-label="高専祭の3Dゲーム画面4枚">
+          <button class="gallery-item" type="button" data-image="assets/festival-01.webp" data-caption="KosenNIGHT：屋外でのゲームプレイ画面"><img src="assets/festival-01.webp" loading="lazy" alt="KosenNIGHTの屋外ステージ。キャラクターが敵と向かい合う場面"><span class="gallery-caption">01 — 屋外ステージとゲーム画面</span></button>
+          <button class="gallery-item" type="button" data-image="assets/festival-02.webp" data-caption="KosenNIGHT：建物やベンチが並ぶエリア"><img src="assets/festival-02.webp" loading="lazy" alt="木々やベンチ、建物がある3D空間でのゲームプレイ画面"><span class="gallery-caption">02 — キャンパスを模した3D空間</span></button>
+          <button class="gallery-item" type="button" data-image="assets/festival-03.webp" data-caption="KosenNIGHT：視点を変えた戦闘シーン"><img src="assets/festival-03.webp" loading="lazy" alt="上から見たプレイヤーと複数のキャラクターが登場するゲーム画面"><span class="gallery-caption">03 — プレイ中のシーン</span></button>
+          <button class="gallery-item" type="button" data-image="assets/festival-04.webp" data-caption="KosenNIGHT：建物に囲まれたエリア"><img src="assets/festival-04.webp" loading="lazy" alt="建物に囲まれた中庭のような3D空間を移動するゲーム画面"><span class="gallery-caption">04 — 建物エリアの3D表現</span></button>
+        </div>
+        <p class="status-note">掲載画像は高専祭で展示したゲームのプレイ画面です。ゲーム本体はチームメンバーの制作物で、私の担当は企画と来場者への説明です。</p>
+      </article>
+    </section>
+
+    <section class="container content-section" id="skills" aria-labelledby="skills-heading">
+      <div class="section-head"><span class="section-number">03 /</span><div><h2 class="section-title" id="skills-heading">Skills & tools</h2><p class="section-sub">授業や制作で触れた技術（習熟度を誇張しない紹介）</p></div></div>
+      <div class="skills-grid">
+        <article class="surface skill"><div class="skill-icon">⌘</div><h3>Python</h3><p>授業・自由制作課題で使用。辞書、関数、条件分岐など。</p></article>
+        <article class="surface skill"><div class="skill-icon">&lt;/&gt;</div><h3>C言語</h3><p>授業で基本的なプログラミングを学習。</p></article>
+        <article class="surface skill"><div class="skill-icon">◈</div><h3>Arduino</h3><p>授業で使用。マイコンの制御に触れました。</p></article>
+        <article class="surface skill"><div class="skill-icon">◉</div><h3>Raspberry Pi</h3><p>授業で使用。小型コンピュータの操作を経験。</p></article>
+        <article class="surface skill"><div class="skill-icon">{ }</div><h3>Google Colab</h3><p>Pythonのコード作成・実行に使用。</p></article>
+        <article class="surface skill"><div class="skill-icon">↗</div><h3>GitHub</h3><p>制作物の管理・Webページの公開で利用。</p></article>
+      </div>
+    </section>
+
+    <section class="container content-section" id="learning" aria-labelledby="learning-heading">
+      <div class="section-head"><span class="section-number">04 /</span><div><h2 class="section-title" id="learning-heading">Learning</h2><p class="section-sub">AIとデータ分析について学んだこと</p></div></div>
+      <div class="learning-grid">
+        <article class="surface learn-item"><span class="learn-num">01 / DATA ANALYSIS</span><h3>タイタニック号の乗客データ分析</h3><p>松尾研究室関連の講座で、タイタニック号の生存者と死亡者のデータを扱いました。乗客の情報から、生存状況にどのような傾向や規則性があるかを考え、データから特徴を読み取ることを学びました。</p></article>
+        <article class="surface learn-item"><span class="learn-num">02 / AI FUNDAMENTALS</span><h3>AIの仕組みとプロンプトの重要性</h3><p>AIの出力には確率的な仕組みが関係していることや、入力するプロンプトの内容によって回答の質が大きく変わることを学びました。AIを使うだけでなく、仕組みを理解することにも興味を持っています。</p></article>
+      </div>
+    </section>
+
+    <section class="container closing" id="contact" aria-labelledby="contact-heading">
+      <div class="closing-panel">
+        <p class="meta-label">THE NEXT STEP</p>
+        <h2 id="contact-heading">技術を磨きながら、<br>人のためになるものを作っていきたい。</h2>
+        <p>このポートフォリオは、学習や制作の記録を追加しながら更新していきます。</p>
+        <a class="button primary" id="github-profile" href="https://github.com/" target="_blank" rel="noopener noreferrer">GitHubを開く <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+  </main>
+  <footer><div class="container footer-inner"><span>© 2026 Yu Wada</span><span>BUILT WITH CURIOSITY · AI × HUMANITY</span></div></footer>
+  <dialog id="lightbox" aria-label="作品画像の拡大表示"><div class="lightbox-toolbar"><span id="lightbox-title"></span><button class="lightbox-close" type="button" id="lightbox-close" aria-label="閉じる">× 閉じる</button></div><img class="lightbox-image" id="lightbox-image" alt=""></dialog>
+  <script>
+    (() => {
+      'use strict';
+      // GitHub Pages 上で公開した時だけ、自分のリポジトリリンクを自動作成します。
+      const host = window.location.hostname;
+      const match = host.match(/^([^.]+)\.github\.io$/i);
+      if (match) {
+        const username = match[1];
+        const repository = decodeURIComponent(window.location.pathname.split('/').filter(Boolean)[0] || `${username}.github.io`);
+        const repoBase = `https://github.com/${encodeURIComponent(username)}/${encodeURIComponent(repository)}`;
+        const repoLink = document.getElementById('github-notebook');
+        repoLink.href = `${repoBase}/blob/main/assignment04.ipynb`;
+        repoLink.hidden = false;
+        document.getElementById('github-profile').href = `https://github.com/${encodeURIComponent(username)}`;
+      }
+
+      const dialog = document.getElementById('lightbox');
+      document.querySelectorAll('.gallery-item').forEach(button => {
+        button.addEventListener('click', () => {
+          const img = document.getElementById('lightbox-image');
+          img.src = button.dataset.image;
+          img.alt = button.querySelector('img').alt;
+          document.getElementById('lightbox-title').textContent = button.dataset.caption;
+          if (typeof dialog.showModal === 'function') dialog.showModal();
+          else window.open(button.dataset.image, '_blank', 'noopener,noreferrer');
+        });
+      });
+      document.getElementById('lightbox-close').addEventListener('click', () => dialog.close());
+      dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
+
+      const canvas = document.getElementById('neuronCanvas');
+      const ctx = canvas.getContext('2d', { alpha:true });
+      if (!ctx) return;
+      let width = 0, height = 0, ratio = 1, dots = [];
+      const pointer = { x: -500, y: -500, active: false };
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function resize() {
+        width = window.innerWidth; height = window.innerHeight;
+        ratio = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.round(width*ratio);canvas.height=Math.round(height*ratio);
+        ctx.setTransform(ratio,0,0,ratio,0,0);
+        const count = Math.min(105, Math.max(32, Math.floor(width*height/12000)));
+        dots = Array.from({length:count}, () => ({
+          x: Math.random()*width, y:Math.random()*height,
+          vx:(Math.random()-.5)*.45, vy:(Math.random()-.5)*.45,
+          r:Math.random()*1.55+.9, hue:Math.random()<.75 ? 'cyan' : 'purple',
+        }));
+        if (reduceMotion) draw();
+      }
+      window.addEventListener('pointermove', event => {pointer.x=event.clientX;pointer.y=event.clientY;pointer.active=true;}, {passive:true});
+      window.addEventListener('pointerleave', () => {pointer.active=false;}, {passive:true});
+      window.addEventListener('blur', () => {pointer.active=false;});
+      window.addEventListener('resize',resize,{passive:true});
+      function draw() {
+        ctx.clearRect(0,0,width,height);
+        for (const d of dots) {
+          if (!reduceMotion) {
+            d.x += d.vx;d.y+=d.vy;
+            if (d.x < -12 || d.x > width + 12) d.vx*=-1;
+            if (d.y < -12 || d.y > height + 12) d.vy*=-1;
+            if (pointer.active) {
+              const dx=d.x-pointer.x,dy=d.y-pointer.y;
+              const dist=Math.hypot(dx,dy);
+              if (dist>1 && dist<185) {
+                const force=(185-dist)/185;
+                d.x+=(dx/dist)*force*.85;d.y+=(dy/dist)*force*.85;
+              }
+            }
+          }
+        }
+        const maxDist = width<560 ? 125 : 155;
+        for(let i=0;i<dots.length;i++) {
+          const a=dots[i];
+          for(let j=i+1;j<dots.length;j++) {
+            const b=dots[j];
+            const dx=a.x-b.x,dy=a.y-b.y,dist=Math.hypot(dx,dy);
+            if(dist>=maxDist) continue;
+            const midX=(a.x+b.x)/2,midY=(a.y+b.y)/2;
+            const pointerDistance=Math.hypot(midX-pointer.x,midY-pointer.y);
+            const emphasis=pointer.active ? Math.max(0,1-pointerDistance/230) : 0;
+            const alpha=(1-dist/maxDist)*(.16+emphasis*.44);
+            ctx.beginPath();ctx.strokeStyle=`rgba(102,196,246,${alpha})`;ctx.lineWidth=emphasis>.1?1.12:.75;ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+          }
+        }
+        for(const d of dots) {
+          const near=pointer.active?Math.max(0,1-Math.hypot(d.x-pointer.x,d.y-pointer.y)/190):0;
+          const radius=d.r+near*1.65;
+          ctx.beginPath();ctx.fillStyle=d.hue==='cyan'?`rgba(115,229,244,${.45+near*.55})`:`rgba(164,146,255,${.43+near*.5})`;ctx.arc(d.x,d.y,radius,0,Math.PI*2);ctx.fill();
+          if (near>.34) {ctx.beginPath();ctx.strokeStyle=`rgba(113,209,255,${near*.24})`;ctx.lineWidth=1;ctx.arc(d.x,d.y,radius+6,0,Math.PI*2);ctx.stroke();}
+        }
+        if (!reduceMotion) requestAnimationFrame(draw);
+      }
+      resize();
+      if (!reduceMotion) requestAnimationFrame(draw);
+    })();
+  </script>
 </body>
 </html>
